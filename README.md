@@ -10,7 +10,7 @@ Como analista de datos interno en Gamezone, se me ha asignado la tarea de analiz
 - **Expansión geográfica:** Identificar regiones con mayor potencial para productos específicos
 - **Eficiencia operativa:** Analizar patrones temporales para planificar compras y logística
 
-Las consultas de SQL utilizados para inspeccionar y limpiar los datos para este análisis se pueden encontrar aquí [link].
+Las consultas de SQL utilizados para inspeccionar y limpiar los datos para este análisis se pueden encontrar aquí [link](https://github.com/mrdo3197/gamezone-data-analytics-portfolio/blob/main/gamezone_ETL.sql).
 
 Las consultas de SQL orientados a preguntas de negocio específicas se pueden encontrar aquí [link].
 
