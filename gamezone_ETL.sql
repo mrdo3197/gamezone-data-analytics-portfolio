@@ -5,83 +5,83 @@ USE gamezone;
 
 
 -- Crear tabla con datos crudos
-DROP TABLE IF EXISTS staging_orders;
-CREATE TABLE staging_orders (
-	user_id VARCHAR(255),
-    order_id VARCHAR(255),
-    purchase_ts VARCHAR(255),
-    ship_ts VARCHAR(255),
-    product_name VARCHAR(255),
-    product_id VARCHAR(255),
-    usd_price VARCHAR(255),
-    purchase_platform VARCHAR(255),
-    marketing_channel VARCHAR(255),
-    account_creation_method VARCHAR(255),
-    country_code VARCHAR(255)
+DROP TABLE IF EXISTS pedidos_staging ;
+CREATE TABLE pedidos_staging (
+	cliente_id VARCHAR(255),
+    pedido_id  VARCHAR(255),
+    fecha_compra  VARCHAR(255),
+    fecha_envio  VARCHAR(255),
+    nombre_producto  VARCHAR(255),
+    producto_id VARCHAR(255),
+    precio_usd  VARCHAR(255),
+    plataforma_compra  VARCHAR(255),
+    canal_marketing VARCHAR(255),
+    metodo_registro VARCHAR(255),
+    codigo_pais  VARCHAR(255)
 );
 
 
-DROP TABLE IF EXISTS staging_geo_lookup;
-CREATE TABLE staging_geo_lookup (
-	country_code VARCHAR(255),
+DROP TABLE IF EXISTS referencia_geo_staging;
+CREATE TABLE referencia_geo_staging (
+	codigo_pais  VARCHAR(255),
     region VARCHAR(255)
 );
 
 
--- Cargar los datos crudos en la tabla staging_orders
-TRUNCATE staging_orders;
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/orders.csv'
-INTO TABLE staging_orders
+-- Cargar los datos crudos en la tabla pedidos_staging
+TRUNCATE pedidos_staging;
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/pedidos.csv'
+INTO TABLE pedidos_staging
 FIELDS TERMINATED BY ','
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES;
 
 
--- Cargar los datos crudos en la tabla staging_geo_lookup table
-TRUNCATE staging_geo_lookup;
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/geo_lookup.csv'
-INTO TABLE staging_geo_lookup
+-- Cargar los datos crudos en la tabla referencia_geo_staging table
+TRUNCATE referencia_geo_staging;
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/referencia_geo.csv'
+INTO TABLE referencia_geo_staging
 FIELDS TERMINATED BY ','
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES;
 
 
 -- Clean orders table
-DROP TABLE IF EXISTS clean_orders;
-CREATE TABLE clean_orders AS
-WITH clean_orders AS
+DROP TABLE IF EXISTS pedidos_limpia;
+CREATE TABLE pedidos_limpia AS
+WITH pedidos_limpia AS
 (
 	SELECT 
-		TRIM(user_id) AS user_id,
-		TRIM(order_id) AS order_id,
+		TRIM(cliente_id) AS cliente_id,
+		TRIM(pedido_id) AS pedido_id,
 		CASE
-			WHEN purchase_ts LIKE '%:%' THEN STR_TO_DATE(NULLIF(TRIM(SUBSTRING(purchase_ts, 1, 10)), ''), '%m-%d-%Y')
-			ELSE STR_TO_DATE(NULLIF(TRIM(purchase_ts), ''), '%m/%d/%Y')
-		END AS purchase_ts,
-		STR_TO_DATE(NULLIF(TRIM(ship_ts), ''), '%m/%d/%Y') AS ship_ts,
+			WHEN fecha_compra LIKE '%:%' THEN STR_TO_DATE(NULLIF(TRIM(SUBSTRING(fecha_compra, 1, 10)), ''), '%m-%d-%Y')
+			ELSE STR_TO_DATE(NULLIF(TRIM(fecha_compra), ''), '%m/%d/%Y')
+		END AS fecha_compra,
+		STR_TO_DATE(NULLIF(TRIM(fecha_envio), ''), '%m/%d/%Y') AS fecha_envio,
 		CASE
-			WHEN TRIM(product_name) = '27inches 4k gaming monitor' THEN '27in 4K gaming monitor'
-			ELSE TRIM(product_name)
-		END AS product_name,
-		TRIM(product_id) AS product_id,
+			WHEN TRIM(nombre_producto) = '27inches 4k gaming monitor' THEN '27in 4K gaming monitor'
+			ELSE TRIM(nombre_producto)
+		END AS nombre_producto,
+		TRIM(producto_id) AS producto_id,
 		CASE
-			WHEN TRIM(usd_price) = '' THEN NULL
-			ELSE CAST(TRIM(usd_price) AS DECIMAL(10, 2))
-		END AS usd_price,
-		TRIM(purchase_platform) AS purchase_platform,
+			WHEN TRIM(precio_usd) = '' THEN NULL
+			ELSE CAST(TRIM(precio_usd) AS DECIMAL(10, 2))
+		END AS precio_usd,
+		TRIM(plataforma_compra) AS plataforma_compra,
 		CASE
-			WHEN TRIM(marketing_channel) = '' THEN 'unknown'
-			ELSE TRIM(marketing_channel)
-		END AS marketing_channel,
+			WHEN TRIM(canal_marketing) = '' THEN 'unknown'
+			ELSE TRIM(canal_marketing)
+		END AS canal_marketing,
 		CASE
-			WHEN TRIM(account_creation_method) = '' THEN 'unknown'
-			ELSE TRIM(account_creation_method)
-		END AS account_creation_method,
+			WHEN TRIM(metodo_registro) = '' THEN 'unknown'
+			ELSE TRIM(metodo_registro)
+		END AS metodo_registro,
 		CASE
-			WHEN REPLACE(TRIM(country_code), '\r', '') = '' THEN NULL
-			ELSE REPLACE(TRIM(country_code), '\r', '')
-		END AS country_code
-	FROM staging_orders
+			WHEN REPLACE(TRIM(codigo_pais), '\r', '') = '' THEN NULL
+			ELSE REPLACE(TRIM(codigo_pais), '\r', '')
+		END AS codigo_pais
+	FROM pedidos_staging
 ),
 
 duplicates_to_delete AS (
@@ -89,58 +89,57 @@ SELECT
 	*,
 	ROW_NUMBER() OVER (
 		PARTITION BY 
-			order_id,
-			user_id,
-			purchase_ts,
-            ship_ts,
-			product_name,
-            product_id,
-			usd_price,
-            purchase_platform,
-			marketing_channel,
-			account_creation_method,
-			country_code
+			pedido_id,
+			cliente_id,
+			fecha_compra,
+            fecha_envio,
+			nombre_producto,
+            producto_id,
+			precio_usd,
+            plataforma_compra,
+			canal_marketing,
+			metodo_registro,
+			codigo_pais
 	) as row_num
-    FROM clean_orders
+    FROM pedidos_limpia
 )
 SELECT
-	user_id,
-	order_id,
-	purchase_ts,
-	ship_ts,
-	product_name,
-	product_id,
-	usd_price,
-	purchase_platform,
-	marketing_channel,
-	account_creation_method,
-	country_code,
-    datediff(ship_ts, purchase_ts) AS time_to_ship
+	cliente_id,
+	pedido_id,
+	fecha_compra,
+	fecha_envio,
+	nombre_producto,
+	producto_id,
+	precio_usd,
+	plataforma_compra,
+	canal_marketing,
+	metodo_registro,
+	codigo_pais,
+    datediff(fecha_envio, fecha_compra) AS dias_para_envio
 FROM duplicates_to_delete
 WHERE row_num = 1
 ;
 
 
 -- Registro de problemas
-
 -- Duplicados
-WITH duplicate_details AS (
+WITH detalles_duplicado AS (
     SELECT 
-        order_id,
+        pedido_id,
         COUNT(*) AS row_count,
         -- Revisar qué columnas tienen diferencias
-        CASE WHEN COUNT(DISTINCT user_id) > 1 THEN 1 ELSE 0 END AS user_diff,
-        CASE WHEN COUNT(DISTINCT purchase_ts) > 1 THEN 1 ELSE 0 END AS ts_diff,
-        CASE WHEN COUNT(DISTINCT ship_ts) > 1 THEN 1 ELSE 0 END AS ship_ts_diff,
-        CASE WHEN COUNT(DISTINCT product_name) > 1 THEN 1 ELSE 0 END AS product_diff,
-        CASE WHEN COUNT(DISTINCT product_id) > 1 THEN 1 ELSE 0 END AS product_id_diff,
-        CASE WHEN COUNT(DISTINCT usd_price) > 1 THEN 1 ELSE 0 END AS price_diff,
-        CASE WHEN COUNT(DISTINCT purchase_platform) > 1 THEN 1 ELSE 0 END AS purchase_platform_diff,
-        CASE WHEN COUNT(DISTINCT marketing_channel) > 1 THEN 1 ELSE 0 END AS channel_diff,
-        CASE WHEN COUNT(DISTINCT account_creation_method) > 1 THEN 1 ELSE 0 END AS method_diff,
-        CASE WHEN COUNT(DISTINCT country_code) > 1 THEN 1 ELSE 0 END AS country_diff
-    FROM staging_orders
-    GROUP BY order_id
+        CASE WHEN COUNT(DISTINCT cliente_id) > 1 THEN 1 ELSE 0 END AS cliente_id_dif,
+        CASE WHEN COUNT(DISTINCT fecha_compra) > 1 THEN 1 ELSE 0 END AS fecha_dif,
+        CASE WHEN COUNT(DISTINCT fecha_envio) > 1 THEN 1 ELSE 0 END AS fecha_envio_dif,
+        CASE WHEN COUNT(DISTINCT nombre_producto) > 1 THEN 1 ELSE 0 END AS nombre_producto_dif,
+        CASE WHEN COUNT(DISTINCT producto_id) > 1 THEN 1 ELSE 0 END AS producto_id_dif,
+        CASE WHEN COUNT(DISTINCT precio_usd) > 1 THEN 1 ELSE 0 END AS precio_usd_dif,
+        CASE WHEN COUNT(DISTINCT plataforma_compra) > 1 THEN 1 ELSE 0 END AS plataforma_compra_dif,
+        CASE WHEN COUNT(DISTINCT canal_marketing) > 1 THEN 1 ELSE 0 END AS canal_marketing_dif,
+        CASE WHEN COUNT(DISTINCT metodo_registro) > 1 THEN 1 ELSE 0 END AS metodo_registro_dif,
+        CASE WHEN COUNT(DISTINCT codigo_pais) > 1 THEN 1 ELSE 0 END AS codigo_pais_dif
+    FROM pedidos_staging
+    GROUP BY pedido_id
     HAVING COUNT(*) > 1
 ),
 
@@ -148,318 +147,316 @@ duplicate_total AS
 (
 SELECT 
     CASE 
-        WHEN user_diff = 1 AND 
-             ts_diff = 0 AND 
-             ship_ts_diff = 0  AND
-             product_diff = 0 AND 
-             product_id_diff = 0  AND
-             price_diff = 0 AND 
-             purchase_platform_diff = 0  AND
-             channel_diff = 0 AND 
-             method_diff = 0 AND 
-             country_diff = 0 
-        THEN 'Solo user_id difiere'
+        WHEN cliente_id_dif = 1 AND 
+             fecha_dif = 0 AND 
+             fecha_envio_dif = 0  AND
+             nombre_producto_dif = 0 AND 
+             producto_id_dif = 0  AND
+             precio_usd_dif = 0 AND 
+             plataforma_compra_dif = 0  AND
+             canal_marketing_dif = 0 AND 
+             metodo_registro_dif = 0 AND 
+             codigo_pais_dif = 0 
+        THEN 'Solo cliente_id difiere'
         
-        WHEN user_diff = 0 AND 
-             ts_diff = 0 AND 
-             ship_ts_diff = 0  AND
-             product_diff = 0 AND 
-             product_id_diff = 0  AND
-             price_diff = 0 AND 
-             purchase_platform_diff = 0  AND
-             channel_diff = 0 AND 
-             method_diff = 1 AND 
-             country_diff = 0 
-        THEN 'Solo account_creation_method difiere'
+        WHEN cliente_id_dif = 0 AND 
+             fecha_dif = 0 AND 
+             fecha_envio_dif = 0  AND
+             nombre_producto_dif = 0 AND 
+             producto_id_dif = 0  AND
+             precio_usd_dif = 0 AND 
+             plataforma_compra_dif = 0  AND
+             canal_marketing_dif = 0 AND 
+             metodo_registro_dif = 1 AND 
+             codigo_pais_dif = 0 
+        THEN 'Solo metodo_registro difiere'
         
-        WHEN user_diff = 0 AND 
-             ts_diff = 0 AND 
-             ship_ts_diff = 0  AND
-             product_diff = 0 AND 
-             product_id_diff = 0  AND
-             price_diff = 0 AND 
-             purchase_platform_diff = 0  AND
-             channel_diff = 0 AND 
-             method_diff = 0 AND 
-             country_diff = 0 
+        WHEN cliente_id_dif = 0 AND 
+             fecha_dif = 0 AND 
+             fecha_envio_dif = 0  AND
+             nombre_producto_dif = 0 AND 
+             producto_id_dif = 0  AND
+             precio_usd_dif = 0 AND 
+             plataforma_compra_dif = 0  AND
+             canal_marketing_dif = 0 AND 
+             metodo_registro_dif = 0 AND 
+             codigo_pais_dif = 0 
         THEN 'Duplicados exactos'
         
         ELSE 'Múltiples columnas difieren'
-    END AS conflict_type,
-    COUNT(DISTINCT order_id) AS order_count
-FROM duplicate_details
-GROUP BY conflict_type
-ORDER BY order_count DESC
+    END AS tipo_conflicto,
+    COUNT(DISTINCT pedido_id) AS cantidad_pedido
+FROM detalles_duplicado
+GROUP BY tipo_conflicto
+ORDER BY cantidad_pedido DESC
 )
 
 -- Fechas en blanco
 SELECT
-	'staging_orders' AS 'Tabla',
-	'purchase_ts' AS 'Columna',
+	'pedidos_staging' AS 'Tabla',
+	'fecha_compra' AS 'Columna',
 	'Fechas de compra en blanco' AS 'Problema',
     COUNT(*) AS 'Número de filas',
-    CONCAT(CAST((COUNT(*)/(SELECT COUNT(*) FROM staging_orders))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
+    CONCAT(CAST((COUNT(*)/(SELECT COUNT(*) FROM pedidos_staging))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
 	'No' AS '¿Resoluble?',
 	'Requiere más información de la lógica y contexto del negocio y/o forma de captura de los datos. Dejar como está' AS 'Solución'
-FROM staging_orders
-WHERE TRIM(purchase_ts) = ''
+FROM pedidos_staging
+WHERE TRIM(fecha_compra) = ''
 
 UNION ALL
 
 -- Formato de fechas inconsistentes
 SELECT
-	'staging_orders' AS 'Tabla',
-	'purchase_ts' AS 'Columna',
+	'pedidos_staging' AS 'Tabla',
+	'fecha_compra' AS 'Columna',
 	'Formatos de fecha inconsistentes (MM/DD/YYYY vs MM-DD-YYYY HH:MM:SS)' AS 'Problema',
     COUNT(*) AS 'Número de filas',
-    CONCAT(CAST((COUNT(*)/(SELECT COUNT(*) FROM staging_orders))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
+    CONCAT(CAST((COUNT(*)/(SELECT COUNT(*) FROM pedidos_staging))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
 	'Sí' AS '¿Resoluble?',
 	'Aplicar el formato de fecha correcto' AS 'Solución'
-FROM staging_orders
-WHERE TRIM(purchase_ts) LIKE '__-__-____ __:__:__'
+FROM pedidos_staging
+WHERE TRIM(fecha_compra) LIKE '__-__-____ __:__:__'
 
 UNION ALL
 
 -- Ortografía inconsistente
 SELECT
-	'staging_orders' AS 'Tabla',
-	'product_name' AS 'Columna',
+	'pedidos_staging' AS 'Tabla',
+	'nombre_producto' AS 'Columna',
 	'Ortografía inconsistente: "27inches 4k gaming monitor"' AS 'Problema',
     COUNT(*) AS 'Número de filas',
-    CONCAT(CAST((COUNT(*)/(SELECT COUNT(*) FROM staging_orders))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
+    CONCAT(CAST((COUNT(*)/(SELECT COUNT(*) FROM pedidos_staging))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
 	'Sí' AS '¿Resoluble?',
 	'Reemplazar con "27in 4K gaming monitor"' AS 'Solución'
-FROM staging_orders
-WHERE TRIM(product_name) = '27inches 4k gaming monitor'
+FROM pedidos_staging
+WHERE TRIM(nombre_producto) = '27inches 4k gaming monitor'
 
 UNION ALL
 
--- Columna usd_price en blanco
+-- Columna precio_usd en blanco
 SELECT
-	'staging_orders' AS 'Tabla',
-	'usd_price' AS 'Columna',
+	'pedidos_staging' AS 'Tabla',
+	'precio_usd' AS 'Columna',
 	'Valores de precio en blanco' AS 'Problema',
     COUNT(*) AS 'Número de filas',
-    CONCAT(CAST((COUNT(*)/(SELECT COUNT(*) FROM staging_orders))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
+    CONCAT(CAST((COUNT(*)/(SELECT COUNT(*) FROM pedidos_staging))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
 	'No' AS '¿Resoluble?',
 	'Requiere más información de la lógica y contexto del negocio y/o forma de captura de los datos. Dejar como está' AS 'Solución'
-FROM staging_orders
-WHERE TRIM(usd_price) = ''
+FROM pedidos_staging
+WHERE TRIM(precio_usd) = ''
 
 UNION ALL
 
--- Columna usd_price con valor cero (0)
+-- Columna precio_usd con valor cero (0)
 SELECT
-	'staging_orders' AS 'Tabla',
-	'usd_price' AS 'Columna',
+	'pedidos_staging' AS 'Tabla',
+	'precio_usd' AS 'Columna',
 	'Precio con valor cero' AS 'Problema',
     COUNT(*) AS 'Número de filas',
-    CONCAT(CAST((COUNT(*)/(SELECT COUNT(*) FROM staging_orders))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
+    CONCAT(CAST((COUNT(*)/(SELECT COUNT(*) FROM pedidos_staging))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
 	'No' AS '¿Resoluble?',
 	'Requiere más información de la lógica y contexto del negocio y/o forma de captura de los datos. Dejar como está' AS 'Solución'
-FROM staging_orders
-WHERE CAST(TRIM(usd_price) AS DECIMAL) = 0
+FROM pedidos_staging
+WHERE CAST(TRIM(precio_usd) AS DECIMAL) = 0
 
 UNION ALL
 
--- Columna marketing_channel con valores en blanco
+-- Columna canal_marketing con valores en blanco
 SELECT
-	'staging_orders' AS 'Tabla',
-	'marketing_channel' AS 'Columna',
+	'pedidos_staging' AS 'Tabla',
+	'canal_marketing' AS 'Columna',
 	'Canal de marketing en blanco' AS 'Problema',
     COUNT(*) AS 'Número de filas',
-    CONCAT(CAST((COUNT(*)/(SELECT COUNT(*) FROM staging_orders))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
+    CONCAT(CAST((COUNT(*)/(SELECT COUNT(*) FROM pedidos_staging))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
 	'Sí' AS '¿Resoluble?',
 	'Reemplazar por "desconocido"' AS 'Solución'
-FROM staging_orders
-WHERE TRIM(marketing_channel) = ''
+FROM pedidos_staging
+WHERE TRIM(canal_marketing) = ''
 
 UNION ALL
 
--- Columna account_creation_method con valores en blanco
+-- Columna metodo_registro con valores en blanco
 SELECT
-	'staging_orders' AS 'Tabla',
-	'account_creation_method' AS 'Columna',
+	'pedidos_staging' AS 'Tabla',
+	'metodo_registro' AS 'Columna',
 	'Método de creación de cuenta en blanco' AS 'Problema',
     COUNT(*) AS 'Número de filas',
-    CONCAT(CAST((COUNT(*)/(SELECT COUNT(*) FROM staging_orders))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
+    CONCAT(CAST((COUNT(*)/(SELECT COUNT(*) FROM pedidos_staging))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
 	'Sí' AS '¿Resoluble?',
 	'Reemplazar por "desconocido"' AS 'Solución'
-FROM staging_orders
-WHERE TRIM(account_creation_method) = ''
+FROM pedidos_staging
+WHERE TRIM(metodo_registro) = ''
 
 UNION ALL
 
--- Columna country_code con valores en blanco
+-- Columna codigo_pais con valores en blanco
 SELECT
-	'staging_orders' AS 'Tabla',
-	'country_code' AS 'Columna',
+	'pedidos_staging' AS 'Tabla',
+	'codigo_pais' AS 'Columna',
 	'Código de país en blanco' AS 'Problema',
     COUNT(*) AS 'Número de filas',
-    CONCAT(CAST((COUNT(*)/(SELECT COUNT(*) FROM staging_orders))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
+    CONCAT(CAST((COUNT(*)/(SELECT COUNT(*) FROM pedidos_staging))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
 	'No' AS '¿Resoluble?',
 	'Requiere más información de la lógica y contexto del negocio y/o forma de captura de los datos. Dejar como está' AS 'Solución'
-FROM staging_orders
-WHERE REPLACE(TRIM(country_code), '\r', '') = ''
+FROM pedidos_staging
+WHERE REPLACE(TRIM(codigo_pais), '\r', '') = ''
 
 UNION ALL
 
 -- Región en blanco
 SELECT
-	'staging_geo_lookup' AS 'Tabla',
+	'referencia_geo_staging' AS 'Tabla',
 	'region' AS 'Columna',
 	'Código de región en blanco' AS 'Problema',
     COUNT(*) AS 'Número de filas',
-    CONCAT(CAST((COUNT(*)/(SELECT COUNT(*) FROM staging_geo_lookup))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
+    CONCAT(CAST((COUNT(*)/(SELECT COUNT(*) FROM referencia_geo_staging))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
 	'Sí' AS '¿Resoluble?',
 	'Asignar de acuerdo con el código del país' AS 'Solución'
-FROM staging_geo_lookup
+FROM referencia_geo_staging
 WHERE REPLACE(TRIM(region), '\r', '') = ''
 
 UNION ALL
 
 -- Ortografía inconsistente
 SELECT
-	'staging_geo_lookup' AS 'Tabla',
+	'referencia_geo_staging' AS 'Tabla',
 	'region' AS 'Columna',
 	'Ortografía inconsistente: "North America"' AS 'Problema',
     COUNT(*) AS 'Número de filas',
-    CONCAT(CAST((COUNT(*)/(SELECT COUNT(*) FROM staging_geo_lookup))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
+    CONCAT(CAST((COUNT(*)/(SELECT COUNT(*) FROM referencia_geo_staging))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
 	'Sí' AS '¿Resoluble?',
 	'Reemplazar por "NA"' AS 'Solución'
-FROM staging_geo_lookup
+FROM referencia_geo_staging
 WHERE REPLACE(TRIM(region), '\r', '') = 'North America'
 
 UNION ALL
 
 -- Valores sin sentido
 SELECT
-	'staging_geo_lookup' AS 'Tabla',
+	'referencia_geo_staging' AS 'Tabla',
 	'region' AS 'Columna',
 	'Valor sin sentido: "X.x"' AS 'Problema',
     COUNT(*) AS 'Número de filas',
-    CONCAT(CAST((COUNT(*)/(SELECT COUNT(*) FROM staging_geo_lookup))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
+    CONCAT(CAST((COUNT(*)/(SELECT COUNT(*) FROM referencia_geo_staging))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
 	'Sí' AS '¿Resoluble?',
 	'Asignar de acuerdo con el código del país' AS 'Solución'
-FROM staging_geo_lookup
+FROM referencia_geo_staging
 WHERE REPLACE(region, '\r', '') = 'X.x'
 
 UNION ALL
 
 -- Duplicados
 SELECT
-	'staging_orders' AS 'Tabla',
+	'pedidos_staging' AS 'Tabla',
 	'Todas' AS 'Columna',
 	'Duplicados exactos' AS 'Problema',
-    order_count AS 'Número de filas',
-    CONCAT(CAST((order_count/(SELECT COUNT(*) FROM staging_orders))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
+    cantidad_pedido AS 'Número de filas',
+    CONCAT(CAST((cantidad_pedido/(SELECT COUNT(*) FROM pedidos_staging))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
 	'Sí' AS '¿Resoluble?',
 	'Eliminar duplicados, conservar una fila' AS 'Solución'
 FROM duplicate_total
-WHERE conflict_type = 'Duplicados exactos'
+WHERE tipo_conflicto = 'Duplicados exactos'
 
 UNION ALL
 
 SELECT
-	'staging_orders' AS 'Tabla',
+	'pedidos_staging' AS 'Tabla',
 	'Todas' AS 'Columna',
-	'Duplicados parciales: solo user_id difiere' AS 'Problema',
-    order_count AS 'Número de filas',
-    CONCAT(CAST((order_count/(SELECT COUNT(*) FROM staging_orders))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
+	'Duplicados parciales: solo cliente_id difiere' AS 'Problema',
+    cantidad_pedido AS 'Número de filas',
+    CONCAT(CAST((cantidad_pedido/(SELECT COUNT(*) FROM pedidos_staging))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
 	'No' AS '¿Resoluble?',
 	'Requiere más información de la lógica y contexto del negocio y/o forma de captura de los datos. Dejar como está' AS 'Solución'
 FROM duplicate_total
-WHERE conflict_type = 'Solo user_id difiere'
+WHERE tipo_conflicto = 'Solo cliente_id difiere'
 
 UNION ALL
 
 SELECT
-	'staging_orders' AS 'Tabla',
+	'pedidos_staging' AS 'Tabla',
 	'Todas' AS 'Columna',
-	'Duplicados parciales: solo account_creation_method difiere' AS 'Problema',
-    order_count AS 'Número de filas',
-    CONCAT(CAST((order_count/(SELECT COUNT(*) FROM staging_orders))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
+	'Duplicados parciales: solo metodo_registro difiere' AS 'Problema',
+    cantidad_pedido AS 'Número de filas',
+    CONCAT(CAST((cantidad_pedido/(SELECT COUNT(*) FROM pedidos_staging))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
 	'No' AS '¿Resoluble?',
 	'Requiere más información de la lógica y contexto del negocio y/o forma de captura de los datos. Dejar como está' AS 'Solución'
 FROM duplicate_total
-WHERE conflict_type = 'Solo account_creation_method difiere'
+WHERE tipo_conflicto = 'Solo metodo_registro difiere'
 
 UNION ALL
 
 SELECT
-	'clean_orders' AS 'Tabla',
-	'ship_ts' AS 'Columna',
+	'pedidos_limpia' AS 'Tabla',
+	'fecha_envio' AS 'Columna',
 	'Fecha de envío anterior a la fecha de compra' AS 'Problema',
     COUNT(*) AS 'Número de filas',
-    CONCAT(CAST((COUNT(*)/(SELECT COUNT(*) FROM clean_orders))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
+    CONCAT(CAST((COUNT(*)/(SELECT COUNT(*) FROM pedidos_limpia))*100 AS NCHAR(5)), '%') AS 'Porcentaje',
 	'No' AS '¿Resoluble?',
 	'Requiere más información de la lógica y contexto del negocio y/o forma de captura de los datos. Dejar como está' AS 'Solución'
-FROM clean_orders
-WHERE time_to_ship < 0
+FROM pedidos_limpia
+WHERE dias_para_envio < 0
 ;
 
 
 -- Tabla geo_lookup limpia
-DROP TABLE IF EXISTS clean_geo_lookup;
-CREATE TABLE clean_geo_lookup AS
+DROP TABLE IF EXISTS referencia_geo_staging_limpia;
+CREATE TABLE referencia_geo_staging_limpia AS
 SELECT
-	TRIM(country_code) AS country_code,
+	TRIM(codigo_pais) AS codigo_pais,
 	CASE
-	WHEN country_code = 'IE' THEN 'EMEA'
-    WHEN country_code = 'LB' THEN 'EMEA'
-	WHEN country_code = 'MH' THEN 'APAC'
-	WHEN country_code = 'PG' THEN 'APAC'
+	WHEN codigo_pais = 'IE' THEN 'EMEA'
+    WHEN codigo_pais = 'LB' THEN 'EMEA'
+	WHEN codigo_pais = 'MH' THEN 'APAC'
+	WHEN codigo_pais = 'PG' THEN 'APAC'
     WHEN REPLACE(TRIM(region), '\r', '') = 'North America' THEN 'NA'
     ELSE REPLACE(TRIM(region), '\r', '')
     END AS region
-FROM staging_geo_lookup
+FROM referencia_geo_staging
 ;
 
 
 -- Exportar tablas como CSV
--- Tabla clean_orders
-SELECT 'user_id',
-	'order_id',
-	'purchase_ts',
-	'ship_ts',
-	'product_name',
-	'product_id',
-	'usd_price',
-	'purchase_platform',
-	'marketing_channel',
-	'account_creation_method',
-	'country_code',
-    'time_to_ship'
+-- Tabla pedidos_limpia
+SELECT 'cliente_id',
+	'pedido_id',
+	'fecha_compra',
+	'fecha_envio',
+	'nombre_producto',
+	'producto_id',
+	'precio_usd',
+	'plataforma_compra',
+	'canal_marketing',
+	'metodo_registro',
+	'codigo_pais'
 
-UNION
+UNION ALL
 
-SELECT user_id,
-	order_id,
-	IFNULL(purchase_ts, "N/A"),
-	ship_ts,
-	product_name,
-	product_id,
-	IFNULL(usd_price, "N/A"),
-	purchase_platform,
-	marketing_channel,
-	account_creation_method,
-	IFNULL(country_code, "N/A"),
-    time_to_ship
-FROM clean_orders
-INTO OUTFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/clean_orders.csv'
+SELECT cliente_id,
+	pedido_id,
+	IFNULL(fecha_compra, NULL),
+	fecha_envio,
+	nombre_producto,
+	producto_id,
+	IFNULL(precio_usd, NULL),
+	plataforma_compra,
+	canal_marketing,
+	metodo_registro,
+	IFNULL(codigo_pais, NULL)
+FROM pedidos_limpia
+INTO OUTFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/pedidos_limpia.csv'
 FIELDS TERMINATED BY ','
 LINES TERMINATED BY '\r\n';
 
 
 -- Tabla clean_geo_lookup
-SELECT 'country_code',
+SELECT 'codigo_pais',
 	'region'
 
-UNION
+UNION ALL
 
-SELECT country_code,
+SELECT codigo_pais,
 	region
-FROM clean_geo_lookup
-INTO OUTFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/clean_geo_lookup.csv'
+FROM referencia_geo_staging_limpia
+INTO OUTFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/referencia_geo_staging_limpia.csv'
 FIELDS TERMINATED BY ','
 LINES TERMINATED BY '\r\n';
