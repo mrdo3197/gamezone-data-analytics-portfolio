@@ -3,12 +3,13 @@
 # Contexto del Proyecto
 **Gamezone**, fundada en 2018, es una empresa global de comercio electrónico especializada en la venta de productos de videojuegos nuevos y reacondicionados. Opera principalmente a través de su sitio web y aplicación móvil, atendiendo a clientes en múltiples regiones del mundo. El modelo de negocio se centra en la venta directa al consumidor, con un enfoque en productos populares de gaming como consolas, accesorios y equipos especializados.
 
-Como analista de datos interno en Gamezone, se me ha asignado la tarea de analizar el rendimiento de productos e inventario para apoyar las decisiones estratégicas del equipo de Producto y Operaciones. Los objetivos clave del negocio incluyen:
+La compañía cuenta con datos históricos de ventas, esfuerzos de marketing, eficiencia operativa y portafolio de productos que han sido subutilizados. Este proyecto analiza y sintetiza dicha información para identificar insights críticos que impulsen el éxito comercial de Gamezone.
 
-- **Optimización de inventario:** Identificar qué productos generan la mayor parte de los ingresos para priorizar el stock
-- **Estrategia de precios:** Comprender el valor promedio por pedido por producto
-- **Expansión geográfica:** Identificar regiones con mayor potencial para productos específicos
-- **Eficiencia operativa:** Analizar patrones temporales para planificar compras y logística
+**Análisis de tendencias de ventas:** Evaluación de patrones históricos de venta, tanto a nivel global como por región, con foco en ingresos, pedidos y valor promedio del pedido.
+
+**Performance por producto:** Análisis del portafolio de Gamezone para entender su contribución e impacto en los resultados comerciales.
+
+**Benchmark regional:** Evaluación comparativa de ventas y pedidos por región, identificando oportunidades de crecimiento por zona geográfica.
 
 Las consultas de SQL utilizados para inspeccionar y limpiar los datos para este análisis se pueden encontrar aquí [link](https://github.com/mrdo3197/gamezone-data-analytics-portfolio/blob/main/gamezone_ETL.sql).
 
