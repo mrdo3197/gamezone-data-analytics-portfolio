@@ -21,7 +21,7 @@ Los datos de pedidos de Gamezone están alojados en una sola tabla (ver imagen),
 
 <img width="281" height="253" alt="imagen" src="https://github.com/user-attachments/assets/65593ae3-0feb-4f54-9bde-a0fe2ad53639" />
 
-Anterior al comienzo del análisis, una variedad de chequeos fueron llevados a cabo con el fin de asegurar el control de calidad así como la familiarización con el conjunto de datos. Las consultas en SQL utilizadas para la inspección y limpieza de los datos puede ser encontrada aquí[link](https://github.com/mrdo3197/gamezone-data-analytics-portfolio/blob/main/gamezone_ETL.sql).
+Anterior al comienzo del análisis, una variedad de chequeos fueron llevados a cabo con el fin de asegurar el control de calidad así como la familiarización con el conjunto de datos. Las consultas en SQL utilizadas para la inspección y limpieza de los datos puede ser encontrada aquí [link](https://github.com/mrdo3197/gamezone-data-analytics-portfolio/blob/main/gamezone_ETL.sql).
 
 # Executive Summary
 
