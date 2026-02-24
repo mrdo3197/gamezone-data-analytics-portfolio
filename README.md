@@ -13,7 +13,7 @@ Los hallazgos y recomendaciones son realizados en la siguientes areas clave:
 
 Las consultas de SQL utilizados para inspeccionar y limpiar los datos para este análisis se pueden encontrar aquí [link](https://github.com/mrdo3197/gamezone-data-analytics-portfolio/blob/main/gamezone_ETL.sql).
 
-Un dashboard interactivo de Tableau utilizado para reportar y explorar tendencias de ventas se puede encontrar aquí [link].
+Un dashboard interactivo de Tableau utilizado para reportar y explorar tendencias de ventas se puede encontrar aquí [link](https://public.tableau.com/views/Proyecto_Gamezone/Dashboard?:language=es-ES&publish=yes&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link).
 
 # Estructura de Datos y Chequeos Iniciales
 
