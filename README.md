@@ -17,25 +17,21 @@ Un dashboard interactivo de Tableau utilizado para reportar y explorar tendencia
 
 # Estructura de Datos y Chequeos Iniciales
 
-Los datos de pedidos de Gamezone están alojados en una sola tabla que contiene 21,864 registros, donde cada registro representa un ítem único en el pedido de un cliente. Esta estructura es ideal para analizar el rendimiento de productos desde múltiples dimensiones.
+Los datos de pedidos de Gamezone están alojados en una sola tabla (ver imagen), que contiene 21,864 registros, donde cada registro representa un ítem único en el pedido de un cliente. Esta estructura es ideal para analizar el rendimiento de productos desde múltiples dimensiones.
 
 Métricas Principales:
 
-- ```usd_price```: Valor monetario de cada transacción
+- ```precio_usd```: Valor monetario de cada transacción
 
-- ```purchase_ts```: Marca de tiempo de compra
+- ```fecha_compra```: Marca de tiempo de compra
 
-- ```ship_ts```: Marca de tiempo de envío
+- ```fecha_envio```: Marca de tiempo de envío
 
 Dimensiones Clave para Segmentación:
 
-- ```product_name``` y ```product_id```: Para análisis de rendimiento de productos
+- ```nombre_producto```: Para análisis de rendimiento de productos
 
-- ```country_code```: Para análisis geográfico de ventas por producto
-
-- ```purchase_platform```: Para entender el comportamiento de compra por dispositivo
-
-- ```marketing_channel```: Para atribución de ventas (secundario para inventario)
+Anterior al comienzo del análisis, una variedad de chequeos fueron llevados a cabo con el fin de asegurar el control de calidad así como la familiarización con el conjunto de datos. Las consultas en SQL utilizadas para la inspección y limpieza de los datos puede ser encontrada aquí[link](https://github.com/mrdo3197/gamezone-data-analytics-portfolio/blob/main/gamezone_ETL.sql).
 
 # Executive Summary
 
