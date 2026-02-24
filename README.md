@@ -25,8 +25,6 @@ Métricas Principales:
 
 - ```fecha_compra```: Marca de tiempo de compra
 
-- ```fecha_envio```: Marca de tiempo de envío
-
 Dimensiones Clave para Segmentación:
 
 - ```nombre_producto```: Para análisis de rendimiento de productos
