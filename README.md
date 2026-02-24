@@ -23,11 +23,14 @@ Los datos de pedidos de Gamezone están alojados en una sola tabla (ver imagen),
 
 Anterior al comienzo del análisis, una variedad de chequeos fueron llevados a cabo con el fin de asegurar el control de calidad así como la familiarización con el conjunto de datos. Las consultas en SQL utilizadas para la inspección y limpieza de los datos puede ser encontrada aquí [link](https://github.com/mrdo3197/gamezone-data-analytics-portfolio/blob/main/gamezone_ETL.sql).
 
-# Executive Summary
+# Resumen Ejecutivo
 
-### Overview of Findings
+### Resumen de hallazgos
 
 Explain the overarching findings, trends, and themes in 2-3 sentences here. This section should address the question: "If a stakeholder were to take away 3 main insights from your project, what are the most important things they should know?" You can put yourself in the shoes of a specific stakeholder - for example, a marketing manager or finance director - to think creatively about this section.
+
+<img width="1025" height="402" alt="imagen" src="https://github.com/user-attachments/assets/8fb44339-c6a1-4604-8aa9-d06856b115b4" />
+
 
 [Visualization, including a graph of overall trends or snapshot of a dashboard]
 
