@@ -17,7 +17,7 @@ Un dashboard interactivo de Tableau utilizado para reportar y explorar tendencia
 
 # Estructura de Datos y Chequeos Iniciales
 
-Los datos de pedidos de Gamezone están alojados en una sola tabla (ver imagen), que contiene 21,864 registros, donde cada registro representa un ítem único en el pedido de un cliente. Esta estructura es ideal para analizar el rendimiento de productos desde múltiples dimensiones.
+Los datos de pedidos de Gamezone están alojados en una sola tabla (ver imagen), que contiene 54.318 registros, donde cada registro representa un ítem único en el pedido de un cliente. Esta estructura es ideal para analizar el rendimiento de productos desde múltiples dimensiones.
 
 <img width="281" height="253" alt="imagen" src="https://github.com/user-attachments/assets/65593ae3-0feb-4f54-9bde-a0fe2ad53639" />
 
