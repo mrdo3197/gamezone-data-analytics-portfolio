@@ -1,23 +1,19 @@
-# Análisis de Producto e Inventario para Gamezone: Identificando Oportunidades de Optimización del Stock (2019-2023)
+# Análisis de Ventas para Gamezone
 
 # Contexto del Proyecto
 **Gamezone**, fundada en 2018, es una empresa global de comercio electrónico especializada en la venta de productos de videojuegos nuevos y reacondicionados. Opera principalmente a través de su sitio web y aplicación móvil, atendiendo a clientes en múltiples regiones del mundo. El modelo de negocio se centra en la venta directa al consumidor, con un enfoque en productos populares de gaming como consolas, accesorios y equipos especializados.
 
 La compañía cuenta con datos históricos de ventas, esfuerzos de marketing, eficiencia operativa y portafolio de productos que han sido subutilizados. Este proyecto analiza y sintetiza dicha información para identificar insights críticos que impulsen el éxito comercial de Gamezone.
 
-**- Análisis de tendencias de ventas:** Evaluación de patrones históricos de venta, tanto a nivel global como por región, con foco en ingresos, pedidos y valor promedio del pedido.
+Los hallazgos y recomendaciones son realizados en la siguientes areas clave:
+
+**- Análisis de tendencias de ventas:** Evaluación de patrones históricos de venta, con foco en ingresos, pedidos y valor promedio del pedido.
 
 **- Performance por producto:** Análisis del portafolio de Gamezone para entender su contribución e impacto en los resultados comerciales.
 
-**- Benchmark regional:** Evaluación comparativa de ventas y pedidos por región, identificando oportunidades de crecimiento por zona geográfica.
-
 Las consultas de SQL utilizados para inspeccionar y limpiar los datos para este análisis se pueden encontrar aquí [link](https://github.com/mrdo3197/gamezone-data-analytics-portfolio/blob/main/gamezone_ETL.sql).
 
-Las consultas de SQL orientados a preguntas de negocio específicas se pueden encontrar aquí [link].
-
 Un dashboard interactivo de Tableau utilizado para reportar y explorar tendencias de ventas se puede encontrar aquí [link].
-
-
 
 # Estructura de Datos y Chequeos Iniciales
 
