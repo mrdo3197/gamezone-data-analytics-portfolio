@@ -29,7 +29,10 @@ Anterior al comienzo del análisis, una variedad de chequeos fueron llevados a c
 
 Explain the overarching findings, trends, and themes in 2-3 sentences here. This section should address the question: "If a stakeholder were to take away 3 main insights from your project, what are the most important things they should know?" You can put yourself in the shoes of a specific stakeholder - for example, a marketing manager or finance director - to think creatively about this section.
 
-<img width="1025" height="402" alt="imagen" src="https://github.com/user-attachments/assets/8fb44339-c6a1-4604-8aa9-d06856b115b4" />
+Luego de presentar importantes ventas a finales de 2020, las ventas de la compañía se han reducido
+
+<img width="1029" height="505" alt="imagen" src="https://github.com/user-attachments/assets/7efb629b-a890-4429-bee9-13674a34632e" />
+
 
 
 [Visualization, including a graph of overall trends or snapshot of a dashboard]
