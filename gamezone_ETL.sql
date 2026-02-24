@@ -32,7 +32,7 @@ CREATE TABLE referencia_geo_staging (
 TRUNCATE pedidos_staging;
 LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/pedidos.csv'
 INTO TABLE pedidos_staging
-FIELDS TERMINATED BY ','
+FIELDS TERMINATED BY ';'
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES;
 
@@ -55,10 +55,31 @@ WITH pedidos_limpia AS
 		TRIM(cliente_id) AS cliente_id,
 		TRIM(pedido_id) AS pedido_id,
 		CASE
-			WHEN fecha_compra LIKE '%:%' THEN STR_TO_DATE(NULLIF(TRIM(SUBSTRING(fecha_compra, 1, 10)), ''), '%m-%d-%Y')
-			ELSE STR_TO_DATE(NULLIF(TRIM(fecha_compra), ''), '%m/%d/%Y')
+			WHEN fecha_compra LIKE '%:%' THEN 
+				STR_TO_DATE(NULLIF(TRIM(SUBSTRING(fecha_compra, 1, 10)), ''), '%m-%d-%Y')
+			
+			WHEN fecha_compra LIKE '%/%' 
+				 AND SUBSTRING_INDEX(fecha_compra, '/', 1) NOT REGEXP '^[0-9]+$' THEN
+				STR_TO_DATE(NULLIF(TRIM(fecha_compra), ''), '%m/%d/%Y')
+			
+			WHEN fecha_compra LIKE '%/%' THEN
+				STR_TO_DATE(NULLIF(TRIM(fecha_compra), ''), '%d/%m/%Y')
+			
+			ELSE NULL
 		END AS fecha_compra,
-		STR_TO_DATE(NULLIF(TRIM(fecha_envio), ''), '%m/%d/%Y') AS fecha_envio,
+		CASE
+			WHEN fecha_envio LIKE '%:%' THEN 
+				STR_TO_DATE(NULLIF(TRIM(SUBSTRING(fecha_envio, 1, 10)), ''), '%m-%d-%Y')
+			
+			WHEN fecha_envio LIKE '%/%' 
+				 AND SUBSTRING_INDEX(fecha_envio, '/', 1) NOT REGEXP '^[0-9]+$' THEN
+				STR_TO_DATE(NULLIF(TRIM(fecha_envio), ''), '%m/%d/%Y')
+			
+			WHEN fecha_compra LIKE '%/%' THEN
+				STR_TO_DATE(NULLIF(TRIM(fecha_envio), ''), '%d/%m/%Y')
+			
+			ELSE NULL
+		END AS fecha_envio,
 		CASE
 			WHEN TRIM(nombre_producto) = '27inches 4k gaming monitor' THEN '27in 4K gaming monitor'
 			ELSE TRIM(nombre_producto)
